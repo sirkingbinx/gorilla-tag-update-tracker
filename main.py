@@ -6,6 +6,7 @@ from discord import app_commands
 from dotenv import load_dotenv
 from steam.client import SteamClient
 
+import datetime
 import discord
 import os
 
@@ -95,9 +96,15 @@ client = commands.Bot(command_prefix="!", intents=intents)
 @app_commands.describe(target_channel="The channel you want to send the message to")
 @app_commands.checks.has_permissions(manage_channels=True, administrator=True)
 async def set_channel(interaction: discord.Interaction, target_channel: discord.TextChannel):
+    perms = target_channel.permissions_for(target_channel.guild.me)
+
+    if not perms.send_messages:
+        await interaction.response.send_message(f"I don't have permission to send messages in {target_channel.mention}. Please fix that")
+        return
+
     db.add_channel(target_channel.id)
-    await msg.send_welcome_message(client, target_channel.id, last_build_id, last_unity_ver_id, last_version_id)
-    await interaction.response.send_message(f"Now routing messages to {target_channel.mention}")
+    await msg.send_welcome_message(client, target_channel.id, last_build_id, last_version_id, last_unity_ver_id)
+    await interaction.response.send_message(f"Now routing messages to {target_channel.mention}.")
 
 @client.tree.command(name="del_channel", description="Remove your channels from the update tracker")
 @app_commands.describe(target_channel="The channel you want to send the message to")
@@ -106,6 +113,28 @@ async def del_channel(interaction: discord.Interaction, target_channel: discord.
     db.del_channel(target_channel.id)
     await interaction.response.send_message(f"Deleted announcements for {target_channel.mention}")
 
+@client.tree.command(name="current", description="Get the current version data")
+async def del_channel(interaction: discord.Interaction, target_channel: discord.TextChannel):
+    embed = discord.Embed(title="Welcome",
+                          description="You are now subscribed to Gorilla Tag update notifications. If this was not intended, run /del_channel with *Manage Channels* permissions.",
+                          timestamp=datetime.datetime.now())
+
+    steamdb_url = f"https://steamdb.info/patchnotes/{last_build_id}/"
+
+    embed.add_field(name="Unity Version",
+                    value=f"`{last_unity_ver_id}`",
+                    inline=True)
+    embed.add_field(name="Game Version",
+                    value=f"`{last_version_id}`",
+                    inline=True)
+    embed.add_field(name="SteamDB",
+                    value=steamdb_url,
+                    inline=False)
+
+    embed.set_footer(text="Gorilla Tag Update Tracker")
+
+    await interaction.response.send_message(embed=embed)
+
 @client.tree.command(name="gt_ping", description="Test connectivity")
 async def gt_ping(interaction: discord.Interaction):
     await interaction.response.send_message(f"Pong in {round(client.latency * 1000)}ms")
@@ -113,7 +142,6 @@ async def gt_ping(interaction: discord.Interaction):
 @client.event
 async def on_ready():
     print(f"Auth as {client.user}")
-    get_init_build_id()
 
     check_for_updates.start()
 
@@ -122,4 +150,5 @@ async def on_ready():
     except Exception as e:
         print(f"could not sync commands: {e}")
 
+get_init_build_id()
 client.run(TOKEN)

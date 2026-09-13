@@ -35,5 +35,6 @@ def add_channel(channel_id):
     save_db()
 
 def del_channel(channel_id):
-    channels.remove(channel_id)
-    save_db()
+    if channel_id in channels:
+        channels.remove(channel_id)
+        save_db()
