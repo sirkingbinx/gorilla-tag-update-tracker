@@ -33,3 +33,7 @@ def save_db():
 def add_channel(channel_id):
     channels.append(channel_id)
     save_db()
+
+def del_channel(channel_id):
+    channels.remove(channel_id)
+    save_db()

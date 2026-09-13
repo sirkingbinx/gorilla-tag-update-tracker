@@ -100,9 +100,11 @@ async def set_channel(interaction: discord.Interaction, target_channel: discord.
     await interaction.response.send_message(f"Now routing messages to {target_channel.mention}")
 
 @client.tree.command(name="del_channel", description="Remove your channels from the update tracker")
+@app_commands.describe(target_channel="The channel you want to send the message to")
 @app_commands.checks.has_permissions(manage_channels=True, administrator=True)
-async def del_channel(interaction: discord.Interaction):
-    await interaction.response.send_message(f"Deleted announcements for channel")
+async def del_channel(interaction: discord.Interaction, target_channel: discord.TextChannel):
+    db.del_channel(target_channel.id)
+    await interaction.response.send_message(f"Deleted announcements for {target_channel.mention}")
 
 @client.tree.command(name="gt_ping", description="Test connectivity")
 async def gt_ping(interaction: discord.Interaction):
