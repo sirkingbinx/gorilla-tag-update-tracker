@@ -6,6 +6,7 @@ from discord import app_commands
 from dotenv import load_dotenv
 from steam.client import SteamClient
 
+import asyncio
 import datetime
 import discord
 import os
@@ -77,7 +78,7 @@ async def check_for_updates():
     global last_version_id
     global last_unity_ver_id
 
-    current_build_id = get_latest_build_id(GORILLA_TAG_APP_ID)
+    current_build_id = await asyncio.to_thread(get_latest_build_id, GORILLA_TAG_APP_ID)
 
     if current_build_id and current_build_id != last_build_id:
         current_version_info = vextract.get_version()
@@ -114,9 +115,9 @@ async def del_channel(interaction: discord.Interaction, target_channel: discord.
     await interaction.response.send_message(f"Deleted announcements for {target_channel.mention}")
 
 @client.tree.command(name="current", description="Get the current version data")
-async def del_channel(interaction: discord.Interaction, target_channel: discord.TextChannel):
-    embed = discord.Embed(title="Welcome",
-                          description="You are now subscribed to Gorilla Tag update notifications. If this was not intended, run /del_channel with *Manage Channels* permissions.",
+async def current_data(interaction: discord.Interaction):
+    embed = discord.Embed(title="Current Version",
+                          description="Here is the current version information.",
                           timestamp=datetime.datetime.now())
 
     steamdb_url = f"https://steamdb.info/patchnotes/{last_build_id}/"
@@ -135,9 +136,9 @@ async def del_channel(interaction: discord.Interaction, target_channel: discord.
 
     await interaction.response.send_message(embed=embed)
 
-@client.tree.command(name="gt_ping", description="Test connectivity")
+@client.tree.command(name="ping", description="Test connectivity")
 async def gt_ping(interaction: discord.Interaction):
-    await interaction.response.send_message(f"Pong in {round(client.latency * 1000)}ms")
+    await interaction.response.send_message(f"Pong: {round(client.latency * 1000)}ms")
 
 @client.event
 async def on_ready():
@@ -151,4 +152,5 @@ async def on_ready():
         print(f"could not sync commands: {e}")
 
 get_init_build_id()
+db.load_db()
 client.run(TOKEN)
