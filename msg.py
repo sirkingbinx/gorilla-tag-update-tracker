@@ -4,7 +4,6 @@ from discord import Client
 
 import db
 
-
 async def send_welcome_message(client: Client, channel_id, build_id, build_version, unity_ver):
     embed = discord.Embed(title="Welcome",
                           description="You are now subscribed to Gorilla Tag update notifications. If this was not intended, run /del_channel with *Manage Channels* permissions.",

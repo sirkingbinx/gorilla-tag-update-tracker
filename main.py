@@ -4,12 +4,14 @@ import sys
 from discord.ext import commands, tasks
 from discord import app_commands
 from dotenv import load_dotenv
+from flask import Flask
 from steam.client import SteamClient
 
 import asyncio
 import datetime
 import discord
 import os
+import threading
 
 import db
 import msg
@@ -25,6 +27,8 @@ if TOKEN is None:
     sys.exit(1)
 
 intents = discord.Intents.default()
+
+app = Flask(__name__)
 
 def get_latest_build_id(app_id):
     steam_client = SteamClient()
@@ -105,14 +109,14 @@ async def set_channel(interaction: discord.Interaction, target_channel: discord.
 
     db.add_channel(target_channel.id)
     await msg.send_welcome_message(client, target_channel.id, last_build_id, last_version_id, last_unity_ver_id)
-    await interaction.response.send_message(f"Now routing messages to {target_channel.mention}.")
+    await interaction.response.send_message(f"Now routing messages to {target_channel.mention}.", ephemeral=True)
 
 @client.tree.command(name="del_channel", description="Remove your channels from the update tracker")
 @app_commands.describe(target_channel="The channel you want to send the message to")
 @app_commands.checks.has_permissions(manage_channels=True, administrator=True)
 async def del_channel(interaction: discord.Interaction, target_channel: discord.TextChannel):
     db.del_channel(target_channel.id)
-    await interaction.response.send_message(f"Deleted announcements for {target_channel.mention}")
+    await interaction.response.send_message(f"Deleted announcements for {target_channel.mention}", ephemeral=True)
 
 @client.tree.command(name="current", description="Get the current version data")
 async def current_data(interaction: discord.Interaction):
@@ -134,11 +138,15 @@ async def current_data(interaction: discord.Interaction):
 
     embed.set_footer(text="Gorilla Tag Update Tracker")
 
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
-@client.tree.command(name="ping", description="Test connectivity")
-async def gt_ping(interaction: discord.Interaction):
-    await interaction.response.send_message(f"Pong: {round(client.latency * 1000)}ms")
+@client.tree.command(name="unity_version", description="Return the current Unity version for Gorilla Tag")
+async def unity_version(interaction: discord.Interaction):
+    await interaction.response.send_message("Unity " + last_unity_ver_id, ephemeral=True)
+
+@client.tree.command(name="game_version", description="Return the current game version for Gorilla Tag")
+async def unity_version(interaction: discord.Interaction):
+    await interaction.response.send_message("Gorilla Tag v" + last_version_id, ephemeral=True)
 
 @client.event
 async def on_ready():
@@ -153,4 +161,20 @@ async def on_ready():
 
 get_init_build_id()
 db.load_db()
+
+@app.route("/unity_version")
+def ws_get_unity_version():
+    return last_unity_ver_id
+
+@app.route("/game_version")
+def ws_get_game_version():
+    return last_version_id
+
+def run_flask():
+    app.run(host="0.0.0.0", port=5555, use_reloader=False)
+
+flask_thread = threading.Thread(target=run_flask)
+flask_thread.daemon = True
+flask_thread.start()
+
 client.run(TOKEN)
