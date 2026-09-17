@@ -4,7 +4,7 @@ import sys
 from discord.ext import commands, tasks
 from discord import app_commands
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, Response
 from steam.client import SteamClient
 
 import asyncio
@@ -172,11 +172,11 @@ db.load_db()
 
 @app.route("/unity_version")
 def ws_get_unity_version():
-    return last_unity_ver_id
+    return Response(last_unity_ver_id, mimetype='text/plain')
 
 @app.route("/game_version")
 def ws_get_game_version():
-    return last_version_id
+    return Response(last_version_id, mimetype='text/plain')
 
 def run_flask():
     app.run(host="0.0.0.0", port=5555, use_reloader=False)

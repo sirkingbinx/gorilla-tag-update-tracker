@@ -1,7 +1,6 @@
 import os
 import re
 import subprocess
-import UnityPy
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -17,7 +16,9 @@ commands = (
       '+quit'
 )
 
-OUTPUT_DIR = fr"{STEAMCMD_FOLDER}\steamapps\content\app_1533390\depot_1533391\Gorilla Tag_Data"
+OUTPUT_DIR = os.path.join(STEAMCMD_FOLDER, "steamapps", "content",
+                          "app_1533390", "depot_1533391",
+                          "Gorilla Tag_Data")
 
 def run_steam_download():
     print(f'{STEAMCMD_PATH} {commands}')
