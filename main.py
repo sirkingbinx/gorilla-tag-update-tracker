@@ -156,7 +156,7 @@ async def game_version(interaction: discord.Interaction):
     embed.add_field(name="Game Version", value=last_version_id)
     embed.add_field(name="API", value="https://gtver.sirkingbinx.dev/game_version")
     
-    await interaction.response.send_message(last_version_id, ephemeral=True)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @client.event
 async def on_ready():
