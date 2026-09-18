@@ -144,8 +144,8 @@ async def current_data(interaction: discord.Interaction):
 async def unity_version(interaction: discord.Interaction):
     embed = discord.Embed(title="Version Info", description="The Unity version should match for any AssetBundles or maps you create.", timestamp=datetime.datetime.now())
 
-    embed.add_field("Unity Version", last_unity_ver_id)
-    embed.add_field("API", "https://gtver.sirkingbinx.dev/unity_version")
+    embed.add_field(name="Unity Version", value=last_unity_ver_id)
+    embed.add_field(name="API", value="https://gtver.sirkingbinx.dev/unity_version")
     
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -153,8 +153,8 @@ async def unity_version(interaction: discord.Interaction):
 async def game_version(interaction: discord.Interaction):
     embed = discord.Embed(title="Version Info", description="The game version should match the version displayed on the in-game computer.", timestamp=datetime.datetime.now())
 
-    embed.add_field("Game Version", last_version_id)
-    embed.add_field("API", "https://gtver.sirkingbinx.dev/game_version")
+    embed.add_field(name="Game Version", value=last_version_id)
+    embed.add_field(name="API", value="https://gtver.sirkingbinx.dev/game_version")
     
     await interaction.response.send_message(last_version_id, ephemeral=True)
 
