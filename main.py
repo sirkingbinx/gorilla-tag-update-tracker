@@ -142,7 +142,8 @@ async def current_data(interaction: discord.Interaction):
 
 @client.tree.command(name="unity_version", description="Return the current Unity version for Gorilla Tag")
 async def unity_version(interaction: discord.Interaction):
-    embed = discord.Embed(title="Version Info", timestamp=datetime.datetime.now())
+    embed = discord.Embed(title="Version Info", description="The Unity version should match for any AssetBundles or maps you create.", timestamp=datetime.datetime.now())
+
     embed.add_field("Unity Version", last_unity_ver_id)
     embed.add_field("API", "https://gtver.sirkingbinx.dev/unity_version")
     
@@ -150,7 +151,8 @@ async def unity_version(interaction: discord.Interaction):
 
 @client.tree.command(name="game_version", description="Return the current game version for Gorilla Tag")
 async def game_version(interaction: discord.Interaction):
-    embed = discord.Embed(title="Version Info", timestamp=datetime.datetime.now())
+    embed = discord.Embed(title="Version Info", description="The game version should match the version displayed on the in-game computer.", timestamp=datetime.datetime.now())
+
     embed.add_field("Game Version", last_version_id)
     embed.add_field("API", "https://gtver.sirkingbinx.dev/game_version")
     
